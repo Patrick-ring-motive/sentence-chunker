@@ -11,14 +11,18 @@
  *
  * Response: { "count": n, "chunks": [{ "text", "metadata" }, ...] }
  */
-import chunker, { SEPARATORS } from "./chunker.js";
+import chunker, {
+  SEPARATORS
+} from "./chunker.js";
 
 const isString = x => typeof x === "string" || x instanceof String;
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data, null, 2), {
     status,
-    headers: { "Content-Type": "application/json" }
+    headers: {
+      "Content-Type": "application/json"
+    }
   });
 
 // Build chunk options from GET query params. Numbers/strings/booleans map
@@ -63,16 +67,26 @@ export default {
         text = body?.text;
         if (body?.options && typeof body.options === "object") options = body.options;
       } else {
-        return json({ error: "Method not allowed. Use GET or POST." }, 405);
+        return json({
+          error: "Method not allowed. Use GET or POST."
+        }, 405);
       }
 
       if (!isString(text))
-        return json({ error: 'Missing or invalid "text". Must be a string.' }, 400);
+        return json({
+          error: 'Missing or invalid "text". Must be a string.'
+        }, 400);
 
       const chunks = await chunker.chunk(text, options);
-      return json({ count: chunks.length, chunks });
+      return json({
+        count: chunks.length,
+        chunks
+      });
     } catch (error) {
-      return json({ error: "Internal server error", message: error.message }, 500);
+      return json({
+        error: "Internal server error",
+        message: error.message
+      }, 500);
     }
   }
 };
