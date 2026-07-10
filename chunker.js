@@ -45,10 +45,9 @@ const normalizeOptions = (options = {}) => {
     maxChunkTokens,
     overlapSentences,
     locale: isString(options.locale) ? String(options.locale) : DEFAULT_OPTIONS.locale,
-    useIntlSegmenter:
-      typeof options.useIntlSegmenter === "boolean"
-        ? options.useIntlSegmenter
-        : DEFAULT_OPTIONS.useIntlSegmenter,
+    useIntlSegmenter: typeof options.useIntlSegmenter === "boolean" ?
+      options.useIntlSegmenter :
+      DEFAULT_OPTIONS.useIntlSegmenter,
     separators: normalizeSeparators(options.separators),
   };
 };
@@ -79,7 +78,9 @@ const getSentenceSegmenter = (locale, useIntlSegmenter) => {
   if (segmenterCache.has(key)) return segmenterCache.get(key);
 
   try {
-    const segmenter = new Intl.Segmenter(key, { granularity: "sentence" });
+    const segmenter = new Intl.Segmenter(key, {
+      granularity: "sentence"
+    });
     segmenterCache.set(key, segmenter);
     return segmenter;
   } catch {
@@ -137,22 +138,34 @@ const makeChunk = (sentences, tokenCount, index) => ({
 // or supply your own { pattern, joiner } / { split, joiner } entries.
 export const SEPARATORS = {
   // Sentence endings followed by required whitespace.
-  sentenceWhitespace: { pattern: /(?<=[.?!;])\s+/g, joiner: " " },
+  sentenceWhitespace: {
+    pattern: /(?<=[.?!;])\s+/g,
+    joiner: " "
+  },
   // Sentence endings, whitespace optional (more aggressive).
-  sentence: { pattern: /(?<=[.?!;])\s*/g, joiner: " " },
+  sentence: {
+    pattern: /(?<=[.?!;])\s*/g,
+    joiner: " "
+  },
   // All Unicode newline variants.
-  newline: { split: splitByNewlines, joiner: "\n" },
+  newline: {
+    split: splitByNewlines,
+    joiner: "\n"
+  },
   // Any run of whitespace (last-ditch).
-  whitespace: { pattern: /\s+/g, joiner: " " },
+  whitespace: {
+    pattern: /\s+/g,
+    joiner: " "
+  },
 };
 
 const DEFAULT_JOINER = " ";
 
 const makeRegexSplitter = (pattern) => (text) =>
   stringify(text)
-    .split(pattern)
-    .map((t) => t.trim())
-    .filter(Boolean);
+  .split(pattern)
+  .map((t) => t.trim())
+  .filter(Boolean);
 
 // Normalize a single separator spec into { split, joiner }.
 // Accepts: preset key (string), RegExp, or { pattern|split, joiner }.
@@ -163,16 +176,25 @@ const normalizeSeparator = (spec) => {
   }
 
   if (spec instanceof RegExp) {
-    return { split: makeRegexSplitter(spec), joiner: DEFAULT_JOINER };
+    return {
+      split: makeRegexSplitter(spec),
+      joiner: DEFAULT_JOINER
+    };
   }
 
   if (spec && typeof spec === "object") {
     const joiner = isString(spec.joiner) ? spec.joiner : DEFAULT_JOINER;
     if (typeof spec.split === "function") {
-      return { split: spec.split, joiner };
+      return {
+        split: spec.split,
+        joiner
+      };
     }
     if (spec.pattern instanceof RegExp) {
-      return { split: makeRegexSplitter(spec.pattern), joiner };
+      return {
+        split: makeRegexSplitter(spec.pattern),
+        joiner
+      };
     }
   }
 
@@ -183,9 +205,9 @@ const normalizeSeparator = (spec) => {
 const normalizeSeparators = (separators) => {
   const list = isArray(separators) ? separators : DEFAULT_OPTIONS.separators;
   const normalized = list.map(normalizeSeparator).filter(Boolean);
-  return normalized.length
-    ? normalized
-    : DEFAULT_OPTIONS.separators.map(normalizeSeparator);
+  return normalized.length ?
+    normalized :
+    DEFAULT_OPTIONS.separators.map(normalizeSeparator);
 };
 
 const regroupPieces = (pieces, joiner, baseChunk, options) => {
@@ -231,7 +253,10 @@ const rescueOversizedChunk = (chunk, options, level = 0) => {
     return [chunk];
   }
 
-  const { split, joiner } = levels[level];
+  const {
+    split,
+    joiner
+  } = levels[level];
   const pieces = split(chunk.text);
 
   // This strategy can't break it down further; escalate.
@@ -267,7 +292,10 @@ export const createChunker = (baseOptions = {}) => {
      *     preset key (see SEPARATORS), a RegExp, or { pattern|split, joiner }.
      */
     async chunk(text, flags = {}) {
-      const options = normalizeOptions({ ...normalizedBase, ...flags });
+      const options = normalizeOptions({
+        ...normalizedBase,
+        ...flags
+      });
       const source = stringify(text);
       if (!source.trim()) return [];
 
