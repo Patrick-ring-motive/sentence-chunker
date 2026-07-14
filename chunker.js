@@ -46,8 +46,7 @@ const normalizeOptions = (options = {}) => {
     overlapSentences,
     locale: isString(options.locale) ? String(options.locale) : DEFAULT_OPTIONS.locale,
     useIntlSegmenter: typeof options.useIntlSegmenter === "boolean" ?
-      options.useIntlSegmenter :
-      DEFAULT_OPTIONS.useIntlSegmenter,
+      options.useIntlSegmenter : DEFAULT_OPTIONS.useIntlSegmenter,
     separators: normalizeSeparators(options.separators),
   };
 };
